@@ -176,7 +176,7 @@ void scan_to_cloud(const ouster::XYZLut& xyz_lut,
                 for (auto v = 0; v < ls.w; v++) {
                     const auto xyz = points.row(u * ls.w + v);
                     const auto ts = (ls.header(v).timestamp - scan_ts).count();
-                    cloud(v, (u / 2)) = ouster_ros::Point{
+                    cloud(v, u) = ouster_ros::Point{
                         {{static_cast<float>(xyz(0)),
                           static_cast<float>(xyz(1)),
                           static_cast<float>(xyz(2)), 1.0f}},
