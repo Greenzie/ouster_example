@@ -55,6 +55,13 @@ enum lidar_mode {
     MODE_2048x10
 };
 
+enum pc_vertical_resolution {
+    PC_VERT_RES_UNSPEC = 0,
+    FULL_FOV_128,
+    FULL_FOV_64,
+    BELOW_HORIZON_64
+};
+
 enum timestamp_mode {
     TIME_FROM_UNSPEC = 0,
     TIME_FROM_INTERNAL_OSC,
@@ -186,6 +193,16 @@ std::string to_string(lidar_mode mode);
  * @return lidar mode corresponding to the string, or 0 on error
  */
 lidar_mode lidar_mode_of_string(const std::string& s);
+
+std::string to_string(pc_vertical_resolution mode);
+/**
+ * Get point cloud vertical resolution from string.
+ *
+ * @param string
+ * @return point cloud vertical resolution corresponding to the string, or 0 on
+ * error
+ */
+pc_vertical_resolution pc_vertical_resolution_of_string(const std::string& s);
 
 /**
  * Get number of columns in a scan for a lidar mode.

@@ -37,6 +37,12 @@ extern const Table<lidar_mode, const char*, 6> lidar_mode_strings{
      {MODE_1024x20, "1024x20"},
      {MODE_2048x10, "2048x10"}}};
 
+extern const Table<pc_vertical_resolution, const char*, 4>
+    pc_vertical_resolution_strings{{{PC_VERT_RES_UNSPEC, "UNKNOWN"},
+                                    {FULL_FOV_128, "FULL_FOV_128"},
+                                    {FULL_FOV_64, "FULL_FOV_64"},
+                                    {BELOW_HORIZON_64, "BELOW_HORIZON_64"}}};
+
 extern const Table<timestamp_mode, const char*, 4> timestamp_mode_strings{
     {{TIME_FROM_UNSPEC, "UNKNOWN"},
      {TIME_FROM_INTERNAL_OSC, "TIME_FROM_INTERNAL_OSC"},
@@ -321,6 +327,16 @@ std::string to_string(lidar_mode mode) {
 lidar_mode lidar_mode_of_string(const std::string& s) {
     auto res = rlookup(impl::lidar_mode_strings, s.c_str());
     return res ? res.value() : lidar_mode::MODE_UNSPEC;
+}
+
+std::string to_string(pc_vertical_resolution mode) {
+    auto res = lookup(impl::pc_vertical_resolution_strings, mode);
+    return res ? res.value() : "UNKNOWN";
+}
+
+pc_vertical_resolution pc_vertical_resolution_of_string(const std::string& s) {
+    auto res = rlookup(impl::pc_vertical_resolution_strings, s.c_str());
+    return res ? res.value() : pc_vertical_resolution::PC_VERT_RES_UNSPEC;
 }
 
 std::string to_string(timestamp_mode mode) {

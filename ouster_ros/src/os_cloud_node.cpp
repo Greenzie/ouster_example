@@ -35,6 +35,20 @@ int main(int argc, char** argv) {
     auto imu_frame = tf_prefix + "os_imu";
     auto lidar_frame = tf_prefix + "os_lidar";
 
+    auto pc_vertical_resolution_arg =
+        nh.param("pc_vertical_resolution", std::string{});
+    sensor::pc_vertical_resolution pc_vertical_resolution =
+        sensor::PC_VERT_RES_UNSPEC;
+    if (pc_vertical_resolution_arg.size()) {
+        pc_vertical_resolution = sensor::pc_vertical_resolution_of_string(
+            pc_vertical_resolution_arg);
+        if (!pc_vertical_resolution) {
+            ROS_ERROR("Invalid point cloud vertical resolution %s",
+                      pc_vertical_resolution_arg.c_str());
+            return EXIT_FAILURE;
+        }
+    }
+
     ouster_ros::OSConfigSrv cfg{};
     auto client = nh.serviceClient<ouster_ros::OSConfigSrv>("os_config");
     client.waitForExistence();
@@ -71,7 +85,7 @@ int main(int argc, char** argv) {
     auto xyz_lut = ouster::make_xyz_lut(info);
 
     ouster::LidarScan ls{W, H, udp_profile_lidar};
-    Cloud cloud{W, (H / 2)};
+    Cloud cloud{W, H};
 
     ouster::ScanBatcher batch(W, pf);
 
@@ -83,7 +97,8 @@ int main(int argc, char** argv) {
                 });
             if (h != ls.headers.end()) {
                 for (int i = 0; i < n_returns; i++) {
-                    scan_to_cloud(xyz_lut, h->timestamp, ls, cloud, i);
+                    scan_to_cloud(xyz_lut, h->timestamp, ls, cloud,
+                                  pc_vertical_resolution, i);
                     lidar_pubs[i].publish(ouster_ros::cloud_to_cloud_msg(
                         cloud, h->timestamp, sensor_frame));
                 }

@@ -107,9 +107,10 @@ inline ouster::img_t<T> get_or_fill_zero(sensor::ChanField f,
 
 void scan_to_cloud(const ouster::XYZLut& xyz_lut,
                    ouster::LidarScan::ts_t scan_ts, const ouster::LidarScan& ls,
-                   ouster_ros::Cloud& cloud, int return_index) {
+                   ouster_ros::Cloud& cloud,
+                   const sensor::pc_vertical_resolution& pc_vertical_resolution,
+                   int return_index) {
     bool second = (return_index == 1);
-    cloud.resize(ls.w * (ls.h / 2));
 
     ouster::img_t<uint16_t> near_ir = get_or_fill_zero<uint16_t>(
         suitable_return(sensor::ChanField::NEAR_IR, second), ls);
@@ -125,22 +126,73 @@ void scan_to_cloud(const ouster::XYZLut& xyz_lut,
 
     auto points = ouster::cartesian(range, xyz_lut);
 
-    for (auto u = 0; u < ls.h; u++) {
-        if (u % 2 == 0) {
-            for (auto v = 0; v < ls.w; v++) {
-                const auto xyz = points.row(u * ls.w + v);
-                const auto ts = (ls.header(v).timestamp - scan_ts).count();
-                cloud(v, (u / 2)) = ouster_ros::Point{
-                    {{static_cast<float>(xyz(0)), static_cast<float>(xyz(1)),
-                      static_cast<float>(xyz(2)), 1.0f}},
-                    static_cast<float>(signal(u, v)),
-                    static_cast<uint32_t>(ts),
-                    static_cast<uint16_t>(reflectivity(u, v)),
-                    static_cast<uint8_t>(u),
-                    static_cast<uint16_t>(near_ir(u, v)),
-                    static_cast<uint32_t>(range(u, v))};
+    switch (pc_vertical_resolution) {
+        case sensor::pc_vertical_resolution::FULL_FOV_128:
+            cloud.resize(ls.w * ls.h);
+            for (auto u = 0; u < ls.h; u++) {
+                for (auto v = 0; v < ls.w; v++) {
+                    const auto xyz = points.row(u * ls.w + v);
+                    const auto ts = (ls.header(v).timestamp - scan_ts).count();
+                    cloud(v, u) = ouster_ros::Point{
+                        {{static_cast<float>(xyz(0)),
+                          static_cast<float>(xyz(1)),
+                          static_cast<float>(xyz(2)), 1.0f}},
+                        static_cast<float>(signal(u, v)),
+                        static_cast<uint32_t>(ts),
+                        static_cast<uint16_t>(reflectivity(u, v)),
+                        static_cast<uint8_t>(u),
+                        static_cast<uint16_t>(near_ir(u, v)),
+                        static_cast<uint32_t>(range(u, v))};
+                }
             }
-        }
+            break;
+
+        case sensor::pc_vertical_resolution::FULL_FOV_64:
+            cloud.resize(ls.w * (ls.h / 2));
+            for (auto u = 0; u < ls.h; u++) {
+                if (u % 2 == 0) {
+                    for (auto v = 0; v < ls.w; v++) {
+                        const auto xyz = points.row(u * ls.w + v);
+                        const auto ts =
+                            (ls.header(v).timestamp - scan_ts).count();
+                        cloud(v, (u / 2)) = ouster_ros::Point{
+                            {{static_cast<float>(xyz(0)),
+                              static_cast<float>(xyz(1)),
+                              static_cast<float>(xyz(2)), 1.0f}},
+                            static_cast<float>(signal(u, v)),
+                            static_cast<uint32_t>(ts),
+                            static_cast<uint16_t>(reflectivity(u, v)),
+                            static_cast<uint8_t>(u),
+                            static_cast<uint16_t>(near_ir(u, v)),
+                            static_cast<uint32_t>(range(u, v))};
+                    }
+                }
+            }
+            break;
+
+        case sensor::pc_vertical_resolution::BELOW_HORIZON_64:
+            cloud.resize(ls.w * (ls.h / 2));
+            for (auto u = 0; u < ls.h / 2; u++) {
+                for (auto v = 0; v < ls.w; v++) {
+                    const auto xyz = points.row(u * ls.w + v);
+                    const auto ts = (ls.header(v).timestamp - scan_ts).count();
+                    cloud(v, (u / 2)) = ouster_ros::Point{
+                        {{static_cast<float>(xyz(0)),
+                          static_cast<float>(xyz(1)),
+                          static_cast<float>(xyz(2)), 1.0f}},
+                        static_cast<float>(signal(u, v)),
+                        static_cast<uint32_t>(ts),
+                        static_cast<uint16_t>(reflectivity(u, v)),
+                        static_cast<uint8_t>(u),
+                        static_cast<uint16_t>(near_ir(u, v)),
+                        static_cast<uint32_t>(range(u, v))};
+                }
+            }
+            break;
+
+        default:
+            ROS_ERROR("Invalid point cloud vertical resolution");
+            break;
     }
 }
 

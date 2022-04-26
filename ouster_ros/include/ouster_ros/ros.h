@@ -66,7 +66,9 @@ sensor_msgs::Imu packet_to_imu_msg(const PacketMsg& pm,
  */
 void scan_to_cloud(const ouster::XYZLut& xyz_lut,
                    ouster::LidarScan::ts_t scan_ts, const ouster::LidarScan& ls,
-                   ouster_ros::Cloud& cloud, int return_index = 0);
+                   ouster_ros::Cloud& cloud,
+                   const sensor::pc_vertical_resolution& pc_vertical_resolution,
+                   int return_index = 0);
 
 /**
  * Serialize a PCL point cloud to a ROS message
