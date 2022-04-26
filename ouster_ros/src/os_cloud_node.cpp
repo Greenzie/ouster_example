@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
     auto xyz_lut = ouster::make_xyz_lut(info);
 
     ouster::LidarScan ls{W, H, udp_profile_lidar};
-    Cloud cloud{W, H};
+    Cloud cloud{W, (H / 2)};
 
     ouster::ScanBatcher batch(W, pf);
 

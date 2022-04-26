@@ -109,7 +109,7 @@ void scan_to_cloud(const ouster::XYZLut& xyz_lut,
                    ouster::LidarScan::ts_t scan_ts, const ouster::LidarScan& ls,
                    ouster_ros::Cloud& cloud, int return_index) {
     bool second = (return_index == 1);
-    cloud.resize(ls.w * ls.h);
+    cloud.resize(ls.w * (ls.h / 2));
 
     ouster::img_t<uint16_t> near_ir = get_or_fill_zero<uint16_t>(
         suitable_return(sensor::ChanField::NEAR_IR, second), ls);
@@ -130,7 +130,7 @@ void scan_to_cloud(const ouster::XYZLut& xyz_lut,
             for (auto v = 0; v < ls.w; v++) {
                 const auto xyz = points.row(u * ls.w + v);
                 const auto ts = (ls.header(v).timestamp - scan_ts).count();
-                cloud(v, u) = ouster_ros::Point{
+                cloud(v, (u / 2)) = ouster_ros::Point{
                     {{static_cast<float>(xyz(0)), static_cast<float>(xyz(1)),
                       static_cast<float>(xyz(2)), 1.0f}},
                     static_cast<float>(signal(u, v)),
