@@ -85,8 +85,18 @@ int main(int argc, char** argv) {
     auto xyz_lut = ouster::make_xyz_lut(info);
 
     ouster::LidarScan ls{W, H, udp_profile_lidar};
-    Cloud cloud{W, H};
 
+    uint32_t cloud_height{64};
+    switch (pc_vertical_resolution) {
+        case sensor::FULL_FOV_128:
+            cloud_height = 128;
+            break;
+
+        default:
+            break;
+    }
+
+    Cloud cloud{W, cloud_height};
     ouster::ScanBatcher batch(W, pf);
 
     auto lidar_handler = [&](const PacketMsg& pm) mutable {
