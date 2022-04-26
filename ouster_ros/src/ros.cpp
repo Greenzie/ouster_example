@@ -172,7 +172,7 @@ void scan_to_cloud(const ouster::XYZLut& xyz_lut,
 
         case sensor::pc_vertical_resolution::BELOW_HORIZON_64:
             cloud.resize(ls.w * (ls.h / 2));
-            for (auto u = 0; u < ls.h / 2; u++) {
+            for (auto u = ls.h/2; u < ls.h; u++) {
                 for (auto v = 0; v < ls.w; v++) {
                     const auto xyz = points.row(u * ls.w + v);
                     const auto ts = (ls.header(v).timestamp - scan_ts).count();
