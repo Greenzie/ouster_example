@@ -190,10 +190,41 @@ void scan_to_cloud(const ouster::XYZLut& xyz_lut,
             }
             break;
 
+        case sensor::pc_vertical_resolution::GRADIENT_64:
+            cloud.resize(ls.w * (ls.h / 2));
+            std::array<int, 64> gradient;
+            fill_gradient(gradient);
+            for (auto u = 0; u < ls.h / 2; u++) {
+                int scan_index = gradient[u];
+                for (auto v = 0; v < ls.w; v++) {
+                    const auto xyz = points.row(scan_index * ls.w + v);
+                    const auto ts = (ls.header(v).timestamp - scan_ts).count();
+                    cloud(v, u) = ouster_ros::Point{
+                        {{static_cast<float>(xyz(0)),
+                          static_cast<float>(xyz(1)),
+                          static_cast<float>(xyz(2)), 1.0f}},
+                        static_cast<float>(signal(scan_index, v)),
+                        static_cast<uint32_t>(ts),
+                        static_cast<uint16_t>(reflectivity(scan_index, v)),
+                        static_cast<uint8_t>(scan_index),
+                        static_cast<uint16_t>(near_ir(scan_index, v)),
+                        static_cast<uint32_t>(range(scan_index, v))};
+                }
+            }
+            break;
+
         default:
             ROS_ERROR("Invalid point cloud vertical resolution");
             break;
     }
+}
+
+void fill_gradient(std::array<int, 64>& gradient) {
+    gradient = {0,  8,  16, 24, 28,  32,  36,  38,  40,  42,  44,  46, 48,
+                50, 52, 53, 54, 55,  56,  57,  58,  59,  60,  61,  62, 63,
+                64, 65, 66, 67, 68,  69,  70,  71,  72,  73,  74,  75, 76,
+                77, 78, 79, 80, 81,  82,  83,  84,  85,  86,  87,  89, 91,
+                93, 95, 97, 99, 101, 103, 107, 111, 115, 119, 123, 127};
 }
 
 sensor_msgs::PointCloud2 cloud_to_cloud_msg(const Cloud& cloud, ns timestamp,

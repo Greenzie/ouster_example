@@ -12,7 +12,7 @@
   <arg name="rviz_config" default="-d $(find ouster_ros)/viz.rviz" doc="optional rviz config file"/>
   <arg name="tf_prefix" default="" doc="namespace for tf transforms"/>
   <arg name="udp_profile_lidar" default="" doc="lidar packet profile: LEGACY, RNG19_RFL8_SIG16_NIR16_DUAL, RNG19_RFL8_SIG16_NIR16, RNG15_RFL8_NIR8"/>
-  <arg name="pc_vertical_resolution" default="FULL_FOV_128" doc="Point cloud vertical resolution, FULL_FOV_128, FULL_FOV_64, BELOW_HORIZON_64"/>
+  <arg name="pc_vertical_resolution" default="FULL_FOV_128" doc="Point cloud vertical resolution, FULL_FOV_128, FULL_FOV_64, BELOW_HORIZON_64, GRADIENT_64"/>
 
   <node pkg="ouster_ros" name="os_node" type="os_node" output="screen" required="true">
     <param name="~/lidar_mode" type="string" value="$(arg lidar_mode)"/>

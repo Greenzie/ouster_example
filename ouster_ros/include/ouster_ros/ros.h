@@ -70,6 +70,8 @@ void scan_to_cloud(const ouster::XYZLut& xyz_lut,
                    const sensor::pc_vertical_resolution& pc_vertical_resolution,
                    int return_index = 0);
 
+void fill_gradient(std::array<int, 64>& gradient);
+
 /**
  * Serialize a PCL point cloud to a ROS message
  * @param cloud the PCL point cloud to convert

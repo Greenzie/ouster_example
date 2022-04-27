@@ -37,11 +37,12 @@ extern const Table<lidar_mode, const char*, 6> lidar_mode_strings{
      {MODE_1024x20, "1024x20"},
      {MODE_2048x10, "2048x10"}}};
 
-extern const Table<pc_vertical_resolution, const char*, 4>
+extern const Table<pc_vertical_resolution, const char*, 5>
     pc_vertical_resolution_strings{{{PC_VERT_RES_UNSPEC, "UNKNOWN"},
                                     {FULL_FOV_128, "FULL_FOV_128"},
                                     {FULL_FOV_64, "FULL_FOV_64"},
-                                    {BELOW_HORIZON_64, "BELOW_HORIZON_64"}}};
+                                    {BELOW_HORIZON_64, "BELOW_HORIZON_64"},
+                                    {GRADIENT_64, "GRADIENT_64"}}};
 
 extern const Table<timestamp_mode, const char*, 4> timestamp_mode_strings{
     {{TIME_FROM_UNSPEC, "UNKNOWN"},

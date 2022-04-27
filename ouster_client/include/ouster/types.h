@@ -59,7 +59,8 @@ enum pc_vertical_resolution {
     PC_VERT_RES_UNSPEC = 0,
     FULL_FOV_128,
     FULL_FOV_64,
-    BELOW_HORIZON_64
+    BELOW_HORIZON_64,
+    GRADIENT_64
 };
 
 enum timestamp_mode {
