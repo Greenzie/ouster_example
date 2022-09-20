@@ -6,3 +6,8 @@ python/**/*.egg-info/
 python/**/*.so
 python/**/*.dll
 .vscode/
+python/**/*.pyd
+
+# visual studio
+.vs/
+out/
